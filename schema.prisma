@@ -1,0 +1,115 @@
+// Este es el archivo principal de Prisma para definir tu base de datos
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") // Define esta variable en tu archivo .env
+}
+
+model Articulo {
+  id             String   @id @default(cuid())
+  nombre         String
+  descripcion    String
+  sku            String   @unique
+  categoria      Categoria @relation(fields: [categoriaId], references: [id])
+  categoriaId    String
+  precioVenta    Float
+  precioCosto    Float
+  stockActual    Int
+  imagenUrl      String?
+  creadoEn       DateTime @default(now())
+  actualizadoEn  DateTime @updatedAt
+  
+  // Relaciones
+  itemsVenta     ItemVenta[]
+  tickets        Ticket[]
+}
+
+model Categoria {
+  id        String     @id @default(cuid())
+  nombre    String     @unique
+  articulos Articulo[]
+}
+
+model Cliente {
+  id         String   @id @default(cuid())
+  nombre     String
+  telefono   String?
+  email      String?
+  creadoEn   DateTime @default(now())
+  actualizadoEn DateTime @updatedAt
+  tickets    Ticket[]
+  ventas     Venta[]
+}
+
+model Ticket {
+  id           String   @id @default(cuid())
+  cliente      Cliente  @relation(fields: [clienteId], references: [id])
+  clienteId    String
+  dispositivo  String
+  falla        String
+  estado       EstadoTicket @default(PENDIENTE)
+  notas        String?
+  precio       Float    @default(0)
+  tecnicoAsignado String?
+  fechaEstimada DateTime?
+  creadoEn     DateTime @default(now())
+  actualizadoEn DateTime @updatedAt
+  
+  // Relación con artículos usados en la reparación
+  articulos    Articulo[]
+}
+
+enum EstadoTicket {
+  PENDIENTE
+  EN_PROCESO
+  FINALIZADO
+  ENTREGADO
+}
+
+model Venta {
+  id           String   @id @default(cuid())
+  cliente      Cliente? @relation(fields: [clienteId], references: [id])
+  clienteId    String?
+  items        ItemVenta[]
+  total        Float
+  metodoPago   MetodoPago
+  creadoEn     DateTime @default(now())
+}
+
+model ItemVenta {
+  id         String   @id @default(cuid())
+  venta      Venta    @relation(fields: [ventaId], references: [id])
+  ventaId    String
+  articulo   Articulo @relation(fields: [articuloId], references: [id])
+  articuloId String
+  cantidad   Int
+  precioUnitario Float
+}
+
+enum MetodoPago {
+  EFECTIVO
+  TARJETA
+  TRANSFERENCIA
+  OTRO
+}
+
+model Usuario {
+  id         String   @id @default(cuid())
+  nombre     String
+  email      String   @unique
+  password   String
+  rol        RolUsuario
+  creadoEn   DateTime @default(now())
+  actualizadoEn DateTime @updatedAt
+}
+
+enum RolUsuario {
+  ADMIN
+  VENDEDOR
+  TÉCNICO
+  GESTOR
+}
