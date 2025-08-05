@@ -2,14 +2,14 @@ services:
   - type: web
     name: pos-backend
     env: node
-    buildCommand: npm install && npm run build
-    startCommand: npm start
+    buildCommand: pnpm install && pnpm run db:migrate && pnpm run build
+    startCommand: pnpm start
     envVars:
-      - key: DATABASE_URL
-        value: postgresql://postgres:i6ZA49F8qEhcd6NO@db.wkhgjnfpjncztbqgeafh.supabase.co:5432/postgres
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 3001
+      - key: DATABASE_URL
+        fromSecret: true
       - key: VITE_SUPABASE_ANON_KEY
-        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndraGdqbmZwam5jenRicWdlYWZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQyMjUzNzQsImV4cCI6MjA2OTgwMTM3NH0.CA5Tt0LlmGxojCBLxBBDzJk7FeINSOWBa38WrEaRi9c 
+        fromSecret: true

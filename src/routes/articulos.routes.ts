@@ -1,9 +1,10 @@
 
 import { Router } from 'express';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../../lib/prisma.js';
+import { articuloSchema } from '../schemas.js';
 
 const router = Router();
-const prisma = new PrismaClient();
+
 
 // Get all articles
 router.get('/articulos', async (req, res) => {
@@ -21,41 +22,29 @@ router.get('/articulos/:id', async (req, res) => {
 });
 
 // Create a new article
-router.post('/articulos', async (req, res) => {
-  const { nombre, descripcion, sku, categoriaId, precioVenta, precioCosto, stockActual, imagenUrl } = req.body;
-  const newArticulo = await prisma.articulo.create({
-    data: {
-      nombre,
-      descripcion,
-      sku,
-      categoriaId,
-      precioVenta,
-      precioCosto,
-      stockActual,
-      imagenUrl,
-    },
-  });
-  res.json(newArticulo);
+router.post('/articulos', async (req, res, next) => {
+  try {
+    const data = articuloSchema.parse(req.body);
+    const newArticulo = await prisma.articulo.create({ data });
+    res.json(newArticulo);
+  } catch (error) {
+    next(error);
+  }
 });
 
 // Update an article
-router.put('/articulos/:id', async (req, res) => {
-  const { id } = req.params;
-  const { nombre, descripcion, sku, categoriaId, precioVenta, precioCosto, stockActual, imagenUrl } = req.body;
-  const updatedArticulo = await prisma.articulo.update({
-    where: { id },
-    data: {
-      nombre,
-      descripcion,
-      sku,
-      categoriaId,
-      precioVenta,
-      precioCosto,
-      stockActual,
-      imagenUrl,
-    },
-  });
-  res.json(updatedArticulo);
+router.put('/articulos/:id', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const data = articuloSchema.parse(req.body);
+    const updatedArticulo = await prisma.articulo.update({
+      where: { id },
+      data,
+    });
+    res.json(updatedArticulo);
+  } catch (error) {
+    next(error);
+  }
 });
 
 // Delete an article

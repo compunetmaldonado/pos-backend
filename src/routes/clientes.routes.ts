@@ -1,9 +1,10 @@
 
 import { Router } from 'express';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../../lib/prisma.js';
+import { clienteSchema } from '../schemas.js';
 
 const router = Router();
-const prisma = new PrismaClient();
+
 
 // Get all clients
 router.get('/clientes', async (req, res) => {
@@ -21,31 +22,29 @@ router.get('/clientes/:id', async (req, res) => {
 });
 
 // Create a new client
-router.post('/clientes', async (req, res) => {
-  const { nombre, telefono, email } = req.body;
-  const newCliente = await prisma.cliente.create({
-    data: {
-      nombre,
-      telefono,
-      email,
-    },
-  });
-  res.json(newCliente);
+router.post('/clientes', async (req, res, next) => {
+  try {
+    const data = clienteSchema.parse(req.body);
+    const newCliente = await prisma.cliente.create({ data });
+    res.json(newCliente);
+  } catch (error) {
+    next(error);
+  }
 });
 
 // Update a client
-router.put('/clientes/:id', async (req, res) => {
-  const { id } = req.params;
-  const { nombre, telefono, email } = req.body;
-  const updatedCliente = await prisma.cliente.update({
-    where: { id },
-    data: {
-      nombre,
-      telefono,
-      email,
-    },
-  });
-  res.json(updatedCliente);
+router.put('/clientes/:id', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const data = clienteSchema.parse(req.body);
+    const updatedCliente = await prisma.cliente.update({
+      where: { id },
+      data,
+    });
+    res.json(updatedCliente);
+  } catch (error) {
+    next(error);
+  }
 });
 
 // Delete a client

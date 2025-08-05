@@ -1,9 +1,10 @@
 
 import { Router } from 'express';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../../lib/prisma.js';
+import { ventaSchema } from '../schemas.js';
 
 const router = Router();
-const prisma = new PrismaClient();
+
 
 // Get all sales
 router.get('/ventas', async (req, res) => {
@@ -24,23 +25,27 @@ router.get('/ventas/:id', async (req, res) => {
 });
 
 // Create a new sale
-router.post('/ventas', async (req, res) => {
-  const { clienteId, items, total, metodoPago } = req.body;
-  const newVenta = await prisma.venta.create({
-    data: {
-      clienteId,
-      total,
-      metodoPago,
-      items: {
-        create: items.map((item: any) => ({
-          articuloId: item.articuloId,
-          cantidad: item.cantidad,
-          precioUnitario: item.precioUnitario,
-        })),
+router.post('/ventas', async (req, res, next) => {
+  try {
+    const { clienteId, items, total, metodoPago } = ventaSchema.parse(req.body);
+    const newVenta = await prisma.venta.create({
+      data: {
+        clienteId,
+        total,
+        metodoPago,
+        items: {
+          create: items.map((item) => ({
+            articuloId: item.articuloId,
+            cantidad: item.cantidad,
+            precioUnitario: item.precioUnitario,
+          })),
+        },
       },
-    },
-  });
-  res.json(newVenta);
+    });
+    res.json(newVenta);
+  } catch (error) {
+    next(error);
+  }
 });
 
 export default router;

@@ -1,9 +1,10 @@
 
 import { Router } from 'express';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../../lib/prisma.js';
+import { ticketSchema } from '../schemas.js';
 
 const router = Router();
-const prisma = new PrismaClient();
+
 
 // Get all tickets
 router.get('/tickets', async (req, res) => {
@@ -21,41 +22,29 @@ router.get('/tickets/:id', async (req, res) => {
 });
 
 // Create a new ticket
-router.post('/tickets', async (req, res) => {
-  const { clienteId, dispositivo, falla, estado, notas, precio, tecnicoAsignado, fechaEstimada } = req.body;
-  const newTicket = await prisma.ticket.create({
-    data: {
-      clienteId,
-      dispositivo,
-      falla,
-      estado,
-      notas,
-      precio,
-      tecnicoAsignado,
-      fechaEstimada,
-    },
-  });
-  res.json(newTicket);
+router.post('/tickets', async (req, res, next) => {
+  try {
+    const data = ticketSchema.parse(req.body);
+    const newTicket = await prisma.ticket.create({ data });
+    res.json(newTicket);
+  } catch (error) {
+    next(error);
+  }
 });
 
 // Update a ticket
-router.put('/tickets/:id', async (req, res) => {
-  const { id } = req.params;
-  const { clienteId, dispositivo, falla, estado, notas, precio, tecnicoAsignado, fechaEstimada } = req.body;
-  const updatedTicket = await prisma.ticket.update({
-    where: { id },
-    data: {
-      clienteId,
-      dispositivo,
-      falla,
-      estado,
-      notas,
-      precio,
-      tecnicoAsignado,
-      fechaEstimada,
-    },
-  });
-  res.json(updatedTicket);
+router.put('/tickets/:id', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const data = ticketSchema.parse(req.body);
+    const updatedTicket = await prisma.ticket.update({
+      where: { id },
+      data,
+    });
+    res.json(updatedTicket);
+  } catch (error) {
+    next(error);
+  }
 });
 
 // Delete a ticket
