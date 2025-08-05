@@ -8,12 +8,15 @@
   },
   "packageManager": "pnpm@8.0.0",
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/server.js",
     "dev": "tsx watch server.ts",
-    "db:generate": "prisma generate",
+    "build": "prisma generate && tsc",
+    "prestart": "prisma generate",
+    "start": "node dist/server.js",
+    "postinstall": "prisma generate",
+    "db:migrate": "prisma migrate deploy",
     "db:push": "prisma db push",
-    "postinstall": "prisma generate"
+    "db:generate": "prisma generate",
+    "lint": "eslint src/**/*.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.13.0",
@@ -26,8 +29,11 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/node": "^24.1.0",
+    "@typescript-eslint/eslint-plugin": "^8.39.0",
+    "@typescript-eslint/parser": "^8.39.0",
+    "eslint": "^8.57.0",
     "prisma": "^6.13.0",
     "tsx": "^4.20.3",
     "typescript": "^5.0.2"
   }
-} 
+}

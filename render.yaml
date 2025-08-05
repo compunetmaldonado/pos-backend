@@ -2,8 +2,8 @@ services:
   - type: web
     name: pos-backend
     env: node
-    buildCommand: chmod +x build-pnpm.sh && ./build-pnpm.sh
-    startCommand: chmod +x start-pnpm.sh && ./start-pnpm.sh
+    buildCommand: bash build-pnpm.sh
+    startCommand: bash start-pnpm.sh
     envVars:
       - key: DATABASE_URL
         value: postgresql://postgres:i6ZA49F8qEhcd6NO@db.wkhgjnfpjncztbqgeafh.supabase.co:5432/postgres
