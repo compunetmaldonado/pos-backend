@@ -21,5 +21,4 @@ Thumbs.db
 README.md
 
 # Lock files from other package managers
-pnpm-lock.yaml
 yarn.lock 

@@ -4,10 +4,9 @@
   "type": "module",
   "engines": {
     "node": "18.17.0",
-    "npm": ">=8.0.0"
+    "pnpm": ">=8.0.0"
   },
-  "packageManager": "npm@8.0.0",
-  "preferNpm": true,
+  "packageManager": "pnpm@8.0.0",
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.js",
